@@ -131,9 +131,11 @@ private:
 	TUniquePtr<FSpatialOutputDevice> SpatialOutputDevice;
 
 	TMap<Worker_EntityId_Key, USpatialActorChannel*> EntityToActorChannel;
-
+public:
 	// Timer manager.
 	FTimerManager* TimerManager;
+
+private:
 
 	bool bAuthoritativeDestruction;
 	bool bConnectAsClient;
