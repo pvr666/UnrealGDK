@@ -713,6 +713,20 @@ int32 USpatialNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConn
 			AActor* Actor = PriorityActors[j]->ActorInfo->Actor;
 			bool bIsRelevant = false;
 
+			// If the actor channel can't be found in the current connection (e.g. if the actor was detached from the controller),
+			// then search through all the connections to find the actor's channel.
+			if (!Channel)
+			{
+				for (int32 ConnIdx = 0; ConnIdx < ClientConnections.Num(); ConnIdx++)
+				{
+					Channel = Cast<USpatialActorChannel>(ClientConnections[ConnIdx]->ActorChannelMap().FindRef(Actor));
+					if (Channel)
+					{
+						break;
+					}
+				}
+			}
+
 			//SpatialGDK: Here, Unreal would check (again) whether an actor is relevant. Removed such checks.
 			// only check visibility on already visible actors every 1.0 + 0.5R seconds
 			// bTearOff actors should never be checked
@@ -1377,4 +1391,13 @@ void USpatialNetDriver::WipeWorld(const USpatialNetDriver::PostWorldWipeDelegate
 	{
 		SnapshotManager->WorldWipe(LoadSnapshotAfterWorldWipe);
 	}
+}
+
+void USpatialNetDriver::DelayedSendDeleteEntityRequest(Worker_EntityId EntityId, float Delay)
+{
+	FTimerHandle RetryTimer;
+	TimerManager->SetTimer(RetryTimer, [this, EntityId]()
+	{
+		Sender->SendDeleteEntityRequest(EntityId);
+	}, Delay, false);
 }

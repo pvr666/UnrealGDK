@@ -127,15 +127,15 @@ public:
 	void StartIgnoringAuthoritativeDestruction() { bAuthoritativeDestruction = false; }
 	void StopIgnoringAuthoritativeDestruction() { bAuthoritativeDestruction = true; }
 
+	void DelayedSendDeleteEntityRequest(Worker_EntityId EntityId, float Delay);
+
 private:
 	TUniquePtr<FSpatialOutputDevice> SpatialOutputDevice;
 
 	TMap<Worker_EntityId_Key, USpatialActorChannel*> EntityToActorChannel;
-public:
+
 	// Timer manager.
 	FTimerManager* TimerManager;
-
-private:
 
 	bool bAuthoritativeDestruction;
 	bool bConnectAsClient;
